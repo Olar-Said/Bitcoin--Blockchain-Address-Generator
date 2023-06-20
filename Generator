@@ -1,0 +1,58 @@
+import hashlib
+import codecs
+pip install ecdsa
+pip install base58
+import ecdsa
+import base58
+
+private_key = "7b0cda14ab09ebeceb460d47b92f959f02540436c98147a81bd07700ea6a9e6a"
+private_key
+private_key_bytes = codecs.decode(private_key, 'hex')
+public_key_raw = ecdsa.SigningKey.from_string(private_key_bytes, curve=ecdsa.SECP256k1).verifying_key
+public_key_bytes = public_key_raw.to_string()
+public_key_hex = codecs.encode(public_key_bytes, 'hex')
+public_key = (b'04' + public_key_hex).decode("utf-8")
+public_key
+if (ord(bytearray.fromhex(public_key[-2:]))%2 == 0):
+  public_key_compressed = '02'
+else:
+  public_key_compressed = '03'
+  public_key_compressed += public_key[2:66]
+
+public_key_compressed
+print(public_key_compressed)
+
+hex_str = bytearray.fromhex(public_key_compressed)
+sha = hashlib.sha256()
+sha.update(hex_str)
+
+sha.hexdigest()
+
+rip = hashlib.new('ripemd160')
+rip.update(sha.digest())
+key_hash = rip.hexdigest()
+key_hash
+
+modified_key_hash = "00" + key_hash
+modified_key_hash
+
+sha = hashlib.sha256()
+hex_str = bytearray.fromhex(modified_key_hash)
+sha.update(hex_str)
+sha.hexdigest()
+
+sha_2 = hashlib.sha256()
+sha_2.update(sha.digest())
+
+sha_2.hexdigest()
+
+checksum = sha_2.hexdigest()[:8]
+checksum
+
+byte_25_address = modified_key_hash + checksum
+byte_25_address
+
+address = base58.b58encode(bytes(bytearray.fromhex(byte_25_address))).decode('utf-8')
+
+address
+
